@@ -4,71 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flying Balloons</title>
+    <title>Balloon Animation and Name Sorting</title>
     <style>
-        canvas {
-            border: 1px solid black;
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        #balloon-container {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .balloon {
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: 20px auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="canvas" width="500" height="500"></canvas>
+    <div id="balloon-container"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Alice</td>
+                <td>Smith</td>
+            </tr>
+            <tr>
+                <td>Bob</td>
+                <td>Johnson</td>
+            </tr>
+            <tr>
+                <td>Charlie</td>
+                <td>Williams</td>
+            </tr>
+            <tr>
+                <td>David</td>
+                <td>Brown</td>
+            </tr>
+        </tbody>
+    </table>
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        class Balloon {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height;
-                const colors = ['red', 'orange', 'yellow', 'green', 'black', 'blue', 'purple'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.diameter = 20;
-                this.speed = 1;
-                this.burstHeight = Math.random() * (canvas.height * 0.8); 
-            }
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.diameter / 2, 0, 2 * Math.PI);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-                ctx.closePath();
-            }
+        const colors = ['red', 'orange', 'yellow', 'green', 'black', 'blue', 'purple'];
 
-            update() {
-                this.y -= this.speed;）
-                this.diameter += 0.2; 
-                if (this.y <= this.burstHeight) {
-                    const index = balloons.indexOf(this);
-                    if (index > -1) {
-                        balloons.splice(index, 1);
-                    }
-                }
+
+        function getRandomColor() {
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            return colors[randomIndex];
+        }
+
+  
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            const diameter = Math.random() * 50 + 30;
+            balloon.style.width = `${diameter}px`;
+            balloon.style.height = `${diameter}px`;
+            balloon.style.backgroundColor = getRandomColor();
+            balloon.style.left = `${Math.random() * 100}vw`;
+            balloon.style.bottom = '-100px';
+            balloon.dataset.height = 0;
+            balloon.dataset.diameter = diameter;
+            balloon.dataset.burstHeight = Math.random() * 800 + 200;
+            document.getElementById('balloon-container').appendChild(balloon);
+            return balloon;
+        }
+
+        function updateBalloon(balloon) {
+            const height = parseFloat(balloon.dataset.height);
+            let diameter = parseFloat(balloon.dataset.diameter);
+            const burstHeight = parseFloat(balloon.dataset.burstHeight);
+
+            balloon.style.bottom = `${height}px`;
+            diameter += 0.1;
+            balloon.style.width = `${diameter}px`;
+            balloon.style.height = `${diameter}px`;
+
+            balloon.dataset.height = height + 1;
+            balloon.dataset.diameter = diameter;
+
+            if (height >= burstHeight) {
+                balloon.remove();
             }
         }
 
-        let balloons = [];
-        const numBalloons = 10;
-
-        function init() {
-            for (let i = 0; i < numBalloons; i++) {
-                balloons.push(new Balloon());
+        function animateBalloons() {
+            if (Math.random() < 0.02) {
+                createBalloon();
             }
-            animate();
+            const balloons = document.querySelectorAll('.balloon');
+            balloons.forEach(updateBalloon);
+            requestAnimationFrame(animateBalloons);
         }
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < balloons.length; i++) {
-                balloons[i].draw();
-                balloons[i].update();
-            }
-            requestAnimationFrame(animate);
-        }
+        animateBalloons();
 
-        window.onload = init;
+
+        window.onload = sortbyfirstname;
+        function sortbyfirstname() {
+            const tbl = document.getElementsByTagName('table')[0];
+            const rows = tbl.rows;
+            const nameArray = [];
+            for (let i = 1; i < rows.length; i++) {
+                const firstName = rows[i].cells[0].innerHTML;
+                nameArray.push(rows[i]);
+            }
+            nameArray.sort((a, b) => {
+                const nameA = a.cells[0].innerHTML.toLowerCase();
+                const nameB = b.cells[0].innerHTML.toLowerCase();
+                if (nameA < nameB) return -1;
+                if (nameA > nameB) return 1;
+                return 0;
+            });
+            while (tbl.rows.length > 1) {
+                tbl.deleteRow(1);
+            }
+            nameArray.forEach(row => {
+                tbl.appendChild(row);
+            });
+        }
     </script>
 </body>
 
 </html>
+    
