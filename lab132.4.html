@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+  <div id="targetElement" style="width: 200px; height: 200px; background-color: lightblue;">
+    Click me
+  </div>
+
+  <script>
+    const targetElement = document.getElementById('targetElement');
+    targetElement.addEventListener('click', function (e) {
+      const x = e.offsetX;
+      const y = e.offsetY;
+      console.log(`Clicked at coordinates: (${x}, ${y})`);
+    });
+  </script>
+
+</body>
+
+</html>

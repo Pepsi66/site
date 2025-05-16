@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+  <input type="file" id="fileInput">
+  <table id="displayTable"></table>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const displayTable = document.getElementById('displayTable');
+
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const csvData = event.target.result;
+          const lines = csvData.split('\n');
+          lines.forEach(function (line) {
+            const cells = line.split(',');
+            const row = document.createElement('tr');
+            cells.forEach(function (cell) {
+              const td = document.createElement('td');
+              td.textContent = cell;
+              row.appendChild(td);
+            });
+            displayTable.appendChild(row);
+          });
+          document.body.appendChild(displayTable);
+        };
+        reader.readAsText(file);
+      }
+    });
+  </script>
+
+</body>
+
+</html>
